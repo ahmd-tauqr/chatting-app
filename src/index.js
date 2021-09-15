@@ -5,6 +5,8 @@ const express = require('express');
 const path = require('path');
 // socket library
 const socketio = require('socket.io')
+// bad word library
+const Filter = require('bad-words')
 
 // initialise the app
 const app = express();
@@ -30,16 +32,26 @@ io.on('connection', (socket) => {
     // broadcast to others only
     socket.broadcast.emit('message', 'a new user joined!')
 
-    socket.on('messageSent', (message) => {
-        io.emit('message',message)
+    socket.on('messageSent', (message, callback) => {
+        const filter = new Filter()
+        if(filter.isProfane(message)) {
+            console.log('warning! profanity is not allowed')
+            io.emit('message',`warning! profanity is not allowed! ${filter.clean(message)}`)
+            callback('delivered!')
+        } else {
+            io.emit('message',message)
+        callback('message delivered!')
+        }
+        
     })
     // when a user leaves the chat
     socket.on('disconnect', () => {
         io.emit('message','a user has left the chat')
     })
     // when location is shared
-    socket.on('sharelocation',(position) =>{
+    socket.on('sharelocation',(position, callback) =>{
         io.emit('message',`https://google.com/maps?q=${position.latitude},${position.longitude}`)
+        callback('location shared!')
     })
 
 })

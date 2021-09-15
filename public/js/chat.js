@@ -9,7 +9,9 @@ socket.on('message', (message) =>{
 document.querySelector('#chatbox').addEventListener('submit', (e) => {
    e.preventDefault()
     const message = e.target.elements.message.value
-    socket.emit('messageSent',message)
+    socket.emit('messageSent',message, (message) => {
+        console.log(message)
+    })
 })
 
 // share location button
@@ -18,12 +20,13 @@ document.querySelector('#sharelocation').addEventListener('click',() => {
        return alert('geolocation is not supported by browser')
    }
    navigator.geolocation.getCurrentPosition((position) => {
-       console.log(position)
        // send location
 socket.emit('sharelocation', {
     latitude:position.coords.latitude,
     longitude: position.coords.longitude,
     accuracy: position.coords.accuracy
+},(message) => {
+    console.log(message)
 })
    })
 })
