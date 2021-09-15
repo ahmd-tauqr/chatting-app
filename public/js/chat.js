@@ -6,7 +6,9 @@ socket.on('messageReceivedEvent', (message) =>{
 })
 
 // button
-document.querySelector('#sendMessage').addEventListener('click', () => {
-   const message = document.querySelector('#messageTextBox').value
+document.querySelector('#chatbox').addEventListener('submit', (e) => {
+   e.preventDefault()
+    const message = e.target.elements.message.value
     socket.emit('messageSent',message)
+
 })
