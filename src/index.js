@@ -22,8 +22,17 @@ const port = process.env.PORT || 3000;
 const publicDirPath = path.join(__dirname, '../public')
 app.use(express.static(publicDirPath));
 
-io.on('connection', () => {
+let messages = []
+
+io.on('connection', (socket) => {
     console.log("new socket connection is up!")
+
+    socket.emit('messageReceivedEvent',messages.length > 0 ? messages[messages.length - 1] : 'welcome to chat app :)')
+    socket.on('messageSent', (message) => {
+        messages.push(message);
+        io.emit('messageReceivedEvent',messages[messages.length - 1])
+    })
+
 })
 
 // kickstart the server
