@@ -22,15 +22,24 @@ const port = process.env.PORT || 3000;
 const publicDirPath = path.join(__dirname, '../public')
 app.use(express.static(publicDirPath));
 
-let messages = []
-
 io.on('connection', (socket) => {
     console.log("new socket connection is up!")
 
-    socket.emit('messageReceivedEvent',messages.length > 0 ? messages[messages.length - 1] : 'welcome to chat app :)')
+    socket.emit('message','welcome to chat :)')
+    // when a new user joins the chat
+    // broadcast to others only
+    socket.broadcast.emit('message', 'a new user joined!')
+
     socket.on('messageSent', (message) => {
-        messages.push(message);
-        io.emit('messageReceivedEvent',messages[messages.length - 1])
+        io.emit('message',message)
+    })
+    // when a user leaves the chat
+    socket.on('disconnect', () => {
+        io.emit('message','a user has left the chat')
+    })
+    // when location is shared
+    socket.on('sharelocation',(position) =>{
+        io.emit('message',`https://google.com/maps?q=${position.latitude},${position.longitude}`)
     })
 
 })
