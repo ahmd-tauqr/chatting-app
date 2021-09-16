@@ -9,7 +9,8 @@ const socketio = require('socket.io')
 const Filter = require('bad-words')
 
 // custom utils
-const {generateMessages, generateLocationMessages} = require('./utils/messages')
+const {generateMessage, generateLocationMessage} = require('./utils/messages')
+const {addUser, removeUser, getUser, getUsersInRoom} = require('./utils/users')
 
 // initialise the app
 const app = express();
@@ -28,44 +29,56 @@ const publicDirPath = path.join(__dirname, '../public')
 app.use(express.static(publicDirPath));
 
 io.on('connection', (socket) => {
-    console.log("new socket connection is up!")
-
-    socket.emit('message',generateMessages("Welcome!"))
-    // when a new user joins the chat
-    // broadcast to others only
-    socket.broadcast.emit('message', generateMessages('a new user joined!'))
-
+    // console.log("new socket connection is up!")
 
     // allow users to join room
-    socket.on('join', ({username, room})=> {
-        socket.join(room)
+    socket.on('join', (options, callback) => {
+        const {error, user} = addUser({id: socket.id, ...options})
 
-        socket.emit('message', generateMessages('Welcome'))
-        socket.broadcast.to(room).emit('message',generateMessages(`${username} has joined!`))
+        if (error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
+
+        socket.emit('message', generateMessage(user.username, 'Welcome!'))
+        socket.broadcast.to(user.room).emit('message', generateMessage(user.username, `${user.username} has joined!`))
+
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        })
+
+        callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
+        const user = getUser(socket.id)
         const filter = new Filter()
-        if(filter.isProfane(message)) {
-            console.log('warning! profanity is not allowed')
-            io.emit('message',`warning! profanity is not allowed! ${filter.clean(message)}`)
-            callback('delivered!')
-        } else {
-            io.to('Noida').emit('message', generateMessage(message))
-            callback()
+        if (filter.isProfane(message)) {
+            return callback('Profanity is not allowed!')
         }
-        
+        io.to(user.room).emit('message', generateMessage(user.username, message))
+        callback()
     })
 
     // when location is shared
-    socket.on('sharelocation',(position, callback) =>{
-        io.emit('locationMessage',generateLocationMessages(`https://google.com/maps?q=${position.latitude},${position.longitude}`))
+    socket.on('sharelocation', (position, callback) => {
+        const user = getUser(socket.id)
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${position.latitude},${position.longitude}`))
         callback('location shared!')
     })
 
     // when a user leaves the chat
     socket.on('disconnect', () => {
-        io.emit('message',generateMessages('a user has left the chat'))
+        const user = removeUser(socket.id)
+        if (user) {
+            io.to(user.room).emit('message', generateMessage(user.username, `${user.username} has left.`))
+            io.to(user.room).emit('roomData', {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            })
+        }
     })
 
 })
