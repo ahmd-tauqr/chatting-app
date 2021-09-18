@@ -12,6 +12,7 @@ const Filter = require('bad-words');
 const {
   generateMessage,
   generateLocationMessage,
+  generateFileMessage,
 } = require('./utils/messages');
 const {
   addUser,
@@ -83,6 +84,15 @@ io.on('connection', (socket) => {
       generateLocationMessage(user.username, position)
     );
     callback('location shared!');
+  });
+
+  //   when file is shared
+  socket.on('fileShare', (file) => {
+    const user = getUser(socket.id);
+    io.to(user.room).emit(
+      'fileMessage',
+      generateFileMessage(user.username, file)
+    );
   });
 
   // when a user leaves the chat

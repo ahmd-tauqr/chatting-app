@@ -12,18 +12,31 @@ const $selectedImage = document.querySelector;
 
 // select file
 $attachmentBtn.addEventListener('click', () => {
-  console.log('select an image');
+  //   console.log('select a file');
   $selectAttachmentInput.click();
-  $selectAttachmentInput.addEventListener('change', () => {
-    console.log($selectAttachmentInput.value);
+  $selectAttachmentInput.addEventListener('change', function (e) {
+    // console.log(e.target.files[0]);
+    let data = e.target.files[0];
+    readThenSendFile(data);
   });
 });
+
+function readThenSendFile(data) {
+  let reader = new FileReader();
+  reader.onload = function (evt) {
+    let msg = {};
+    msg.username = username;
+    msg.file = evt.target.result;
+    msg.fileName = data.name;
+    socket.emit('fileShare', msg);
+  };
+  reader.readAsDataURL(data);
+}
 
 // template
 const messageTemplate = document.querySelector('#message-template').innerHTML;
 const locationTemplate = document.querySelector('#location-template').innerHTML;
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
-// const mapTemplate = document.querySelector('#map-template').innerHTML;
 
 // Options
 const { username, room } = Qs.parse(location.search, {
@@ -128,6 +141,31 @@ socket.on('locationMessage', (message) => {
   $messages.appendChild(mapDiv);
   //   pass data to map
   initMap(data);
+  autoscroll();
+});
+
+// // receive file message from server
+socket.on('fileMessage', (message) => {
+  // render location message
+  const html = Mustache.render(locationTemplate, {
+    username: message.username,
+    file: message.file,
+    createdAt: moment(message.createdAt).format('h:mm a'),
+  });
+  //   get file and check type
+  const file = message.file;
+  console.log('file received', file);
+  //   check file type
+  const fileType = file.file.split(';')[0].split('/')[1];
+  console.log(fileType);
+  // add file message into chat
+  const imageEl = document.createElement('img');
+  imageEl.setAttribute('id', file.fileName.replace(/\s/g, '-'));
+  imageEl.setAttribute('src', file.file);
+  imageEl.style.width = 100 + '%';
+  imageEl.style.height = 'auto';
+  $messages.insertAdjacentHTML('beforeend', html);
+  $messages.appendChild(imageEl);
   autoscroll();
 });
 
