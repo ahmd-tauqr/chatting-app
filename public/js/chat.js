@@ -16,21 +16,23 @@ $attachmentBtn.addEventListener('click', () => {
   $selectAttachmentInput.click();
   $selectAttachmentInput.addEventListener('change', function (e) {
     // console.log(e.target.files[0]);
-    let data = e.target.files[0];
-    readThenSendFile(data);
+    let files = e.target.files;
+    if (files.length > 0) {
+      getBase64AndSend(files[0]);
+    }
   });
 });
 
-function readThenSendFile(data) {
-  let reader = new FileReader();
-  reader.onload = function (evt) {
-    let msg = {};
-    msg.username = username;
-    msg.file = evt.target.result;
-    msg.fileName = data.name;
-    socket.emit('fileShare', msg);
+function getBase64AndSend(file) {
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function () {
+    console.log(reader.result);
+    socket.emit('fileShare', reader.result);
   };
-  reader.readAsDataURL(data);
+  reader.onerror = function (error) {
+    console.log('Error: ', error);
+  };
 }
 
 // template
@@ -152,20 +154,21 @@ socket.on('fileMessage', (message) => {
     file: message.file,
     createdAt: moment(message.createdAt).format('h:mm a'),
   });
+  $messages.insertAdjacentHTML('beforeend', html);
   //   get file and check type
   const file = message.file;
   console.log('file received', file);
   //   check file type
-  const fileType = file.file.split(';')[0].split('/')[1];
+  const fileType = file.split(';')[0].split('/')[1];
   console.log(fileType);
-  // add file message into chat
-  const imageEl = document.createElement('img');
-  imageEl.setAttribute('id', file.fileName.replace(/\s/g, '-'));
-  imageEl.setAttribute('src', file.file);
-  imageEl.style.width = 100 + '%';
-  imageEl.style.height = 'auto';
-  $messages.insertAdjacentHTML('beforeend', html);
-  $messages.appendChild(imageEl);
+  if (fileType === 'png' || fileType === 'jpeg') {
+    const imageEl = document.createElement('img');
+    imageEl.setAttribute('src', file);
+    imageEl.style.width = 100 + '%';
+    imageEl.style.height = 'auto';
+    // add file message into chat
+    $messages.appendChild(imageEl);
+  }
   autoscroll();
 });
 

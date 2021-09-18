@@ -89,6 +89,8 @@ io.on('connection', (socket) => {
   //   when file is shared
   socket.on('fileShare', (file) => {
     const user = getUser(socket.id);
+    console.log('=================================================>', user);
+    console.log('received', file);
     io.to(user.room).emit(
       'fileMessage',
       generateFileMessage(user.username, file)
