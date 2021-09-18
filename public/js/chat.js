@@ -1,5 +1,16 @@
 const socket = io();
 
+// create random mapId for seperate Maps
+const randomID = (length) => {
+  let result = '';
+  let characters = 'abcdefghijklmnopqrstuvwxyz';
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 // element selectors
 const $messageForm = document.querySelector('#message-form');
 const $messageFormInput = document.querySelector('#messageInput');
@@ -9,31 +20,6 @@ const $messages = document.querySelector('#messages');
 const $attachmentBtn = document.querySelector('#send-attachment');
 const $selectAttachmentInput = document.querySelector('#inputFile');
 const $selectedImage = document.querySelector;
-
-// select file
-$attachmentBtn.addEventListener('click', () => {
-  //   console.log('select a file');
-  $selectAttachmentInput.click();
-  $selectAttachmentInput.addEventListener('change', function (e) {
-    // console.log(e.target.files[0]);
-    let files = e.target.files;
-    if (files.length > 0) {
-      getBase64AndSend(files[0]);
-    }
-  });
-});
-
-function getBase64AndSend(file) {
-  var reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = function () {
-    console.log(reader.result);
-    socket.emit('fileShare', reader.result);
-  };
-  reader.onerror = function (error) {
-    console.log('Error: ', error);
-  };
-}
 
 // template
 const messageTemplate = document.querySelector('#message-template').innerHTML;
@@ -101,19 +87,8 @@ socket.on('message', (message) => {
 
 // receive location message from server
 socket.on('locationMessage', (message) => {
-  // create random mapId for seperate Maps
-  const randomMapID = (length) => {
-    let result = '';
-    let characters = 'abcdefghijklmnopqrstuvwxyz';
-    let charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  };
-  const mapID = randomMapID(5);
+  const mapID = randomID(5);
   //   console.log(mapID);
-
   //   prepare data for passing
   const { username, location, createdAt } = message;
   const { latitude, longitude } = location;
@@ -156,15 +131,18 @@ socket.on('fileMessage', (message) => {
   });
   $messages.insertAdjacentHTML('beforeend', html);
   //   get file and check type
-  const file = message.file;
-  console.log('file received', file);
+  let file = message.file;
+  console.log('file received on client', file);
+  //   create random image ID
+  const imageID = randomID(5);
   //   check file type
-  const fileType = file.split(';')[0].split('/')[1];
+  let fileType = file.split(';')[0].split('/')[1];
   console.log(fileType);
   if (fileType === 'png' || fileType === 'jpeg') {
-    const imageEl = document.createElement('img');
+    let imageEl = document.createElement('img');
     imageEl.setAttribute('src', file);
-    imageEl.style.width = 100 + '%';
+    imageEl.setAttribute('id', imageID);
+    imageEl.style.width = 150 + 'px';
     imageEl.style.height = 'auto';
     // add file message into chat
     $messages.appendChild(imageEl);
@@ -222,6 +200,41 @@ $shareLocationBtn.addEventListener('click', () => {
     );
   });
 });
+
+// send file
+
+$attachmentBtn.addEventListener('click', () => {
+  $selectAttachmentInput.click();
+
+  $selectAttachmentInput.addEventListener('change', function () {
+    // send file
+    let files = $selectAttachmentInput.files[0];
+    // console.log(files);
+    if (files) {
+      getBase64(files);
+    }
+  });
+});
+
+function getBase64(file) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function () {
+    console.log('changed to Base64', reader.result);
+    socket.emit(
+      'fileShare',
+      {
+        file: reader.result,
+      },
+      (message) => {
+        console.log(message);
+      }
+    );
+  };
+  reader.onerror = function (error) {
+    console.log('Error: ', error);
+  };
+}
 
 socket.emit('join', { username, room }, (error) => {
   if (error) {

@@ -87,14 +87,15 @@ io.on('connection', (socket) => {
   });
 
   //   when file is shared
-  socket.on('fileShare', (file) => {
+  socket.on('fileShare', (file, callback) => {
     const user = getUser(socket.id);
-    console.log('=================================================>', user);
+    // console.log('=================================================>', user);
     console.log('received', file);
     io.to(user.room).emit(
       'fileMessage',
-      generateFileMessage(user.username, file)
+      generateFileMessage(user.username, file.file)
     );
+    callback('file shared.');
   });
 
   // when a user leaves the chat
