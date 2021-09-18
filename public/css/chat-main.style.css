@@ -1,0 +1,20 @@
+.action-btns {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.icon {
+  width: 56px;
+  height: 56px;
+  background: none;
+}
+
+.icon img {
+  max-width: 100%;
+  height: auto;
+}
+/* map box */
+#map {
+  height: 250px;
+  width: 250px;
+}
