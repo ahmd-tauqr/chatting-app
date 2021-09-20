@@ -142,7 +142,7 @@ socket.on('fileMessage', (message) => {
     let imageEl = document.createElement('img');
     imageEl.setAttribute('src', file);
     imageEl.setAttribute('id', imageID);
-    imageEl.style.width = 150 + 'px';
+    imageEl.style.width = 250 + 'px';
     imageEl.style.height = 'auto';
     // add file message into chat
     $messages.appendChild(imageEl);
