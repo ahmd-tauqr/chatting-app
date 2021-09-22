@@ -131,21 +131,30 @@ socket.on('fileMessage', (message) => {
   });
   $messages.insertAdjacentHTML('beforeend', html);
   //   get file and check type
-  let file = message.file;
-  console.log('file received on client', file);
+  const file = message.file;
+  console.log('file received on client');
   //   create random image ID
   const imageID = randomID(5);
   //   check file type
-  let fileType = file.split(';')[0].split('/')[1];
+  const fileType = file.split(';')[0].split('/')[1];
   console.log(fileType);
   if (fileType === 'png' || fileType === 'jpeg') {
-    let imageEl = document.createElement('img');
+    const imageEl = document.createElement('img');
     imageEl.setAttribute('src', file);
     imageEl.setAttribute('id', imageID);
     imageEl.style.width = 250 + 'px';
     imageEl.style.height = 'auto';
     // add file message into chat
     $messages.appendChild(imageEl);
+  } else if (fileType === 'mp4') {
+    const videoEl = document.createElement('video');
+    videoEl.style.width = 350 + 'px';
+    const sourceMP4 = document.createElement('source');
+    sourceMP4.type = 'video/mp4';
+    sourceMP4.src = file;
+    videoEl.controls = true;
+    videoEl.appendChild(sourceMP4);
+    $messages.appendChild(videoEl);
   }
   autoscroll();
 });
@@ -217,10 +226,10 @@ $attachmentBtn.addEventListener('click', () => {
 });
 
 function getBase64(file) {
-  const reader = new FileReader();
+  let reader = new FileReader();
   reader.readAsDataURL(file);
   reader.onload = function () {
-    console.log('changed to Base64', reader.result);
+    console.log('changed to Base64');
     socket.emit(
       'fileShare',
       {
