@@ -32,4 +32,5 @@ Moment
 - support for more image/video formats
 - compress large media files
 - reply/quoting a message
+- read receipts
 - more
