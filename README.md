@@ -10,6 +10,7 @@ Moment
 
 ## Features
 - share messages
+- share images/video upto 500KB size
 - share location
 - join different chat rooms
 - message delivery acknowledgements
@@ -24,7 +25,7 @@ Moment
 5) have fun chatting
 
 ## More to come
-- send images
-- send videos
-- store users chat histories
+- support for media viewers within chat
+- compress large media files
+- reply/quoting a message
 - more
