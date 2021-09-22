@@ -17,9 +17,8 @@ const $messageFormInput = document.querySelector('#messageInput');
 const $messageFormButton = document.querySelector('#sendMessage');
 const $shareLocationBtn = document.querySelector('#send-location');
 const $messages = document.querySelector('#messages');
-const $attachmentBtn = document.querySelector('#send-attachment');
 const $selectAttachmentInput = document.querySelector('#inputFile');
-const $selectedImage = document.querySelector;
+const $deliveredIcon = document.querySelector('.fa-check');
 
 // template
 const messageTemplate = document.querySelector('#message-template').innerHTML;
@@ -132,12 +131,12 @@ socket.on('fileMessage', (message) => {
   $messages.insertAdjacentHTML('beforeend', html);
   //   get file and check type
   const file = message.file;
-  console.log('file received on client');
+  // console.log('file received on client');
   //   create random image ID
   const imageID = randomID(5);
   //   check file type
   const fileType = file.split(';')[0].split('/')[1];
-  console.log(fileType);
+  // console.log(fileType);
   if (fileType === 'png' || fileType === 'jpeg') {
     const imageEl = document.createElement('img');
     imageEl.setAttribute('src', file);
@@ -183,8 +182,7 @@ $messageForm.addEventListener('submit', (e) => {
     if (error) {
       return console.log(error);
     }
-
-    // console.log('Message delivered!')
+    console.log('Message sent!');
   });
 });
 
@@ -211,32 +209,25 @@ $shareLocationBtn.addEventListener('click', () => {
 });
 
 // send file
-
-$attachmentBtn.addEventListener('click', () => {
-  $selectAttachmentInput.click();
-
-  $selectAttachmentInput.addEventListener('change', function () {
-    // send file
-    let files = $selectAttachmentInput.files[0];
-    // console.log(files);
-    if (files) {
-      getBase64(files);
-    }
-  });
+$selectAttachmentInput.addEventListener('change', function () {
+  let files = $selectAttachmentInput.files[0];
+  if (files) {
+    getBase64(files);
+  }
 });
-
+// helper function
 function getBase64(file) {
   let reader = new FileReader();
   reader.readAsDataURL(file);
   reader.onload = function () {
-    console.log('changed to Base64');
+    // console.log('changed to Base64');
     socket.emit(
       'fileShare',
       {
         file: reader.result,
       },
-      (message) => {
-        console.log(message);
+      () => {
+        console.log('file shared.');
       }
     );
   };

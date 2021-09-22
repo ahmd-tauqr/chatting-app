@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatting App</title>
     <link rel="shortcut icon" href="./img/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font-awesome.min.css" />
     <link rel="stylesheet" href="./css/styles.min.css" />
     <link rel="stylesheet" href="./css/chat-main.style.css" />
   </head>
@@ -24,10 +25,7 @@
               placeholder="Enter message..."
             />
             <div class="action-btns">
-              <input type="file" style="display: none" id="inputFile" />
-              <button id="send-attachment" class="icon" type="button">
-                <img src="./img/paperclip.png" alt="select attachment" />
-              </button>
+              <input type="file" id="inputFile" />
               <button id="send-location" class="icon" type="button">
                 <img src="./img/pin.png" alt="select location" />
               </button>
@@ -44,21 +42,28 @@
     <!-- Message rendering -->
     <script id="message-template" type="text/html">
       <div class="message">
-        <p>
-          <span class="message__name">{{username}}</span>
-          <span class="message__meta">{{createdAt}}</span>
+        <p class="inline-distant">
+          <span>
+            <span class="message__name">{{username}}</span>
+            <span class="message__meta">{{createdAt}}</span>
+          </span>
+          <i class="fa fa-check" aria-hidden="true"></i>
         </p>
-        <p>{{message}}</p>
+        <div class="message-body">{{message}}</div>
       </div>
     </script>
 
     <!-- Location rendering -->
     <script id="location-template" type="text/html">
       <div class="message">
-        <p>
-          <span class="message__name">{{username}}</span>
-          <span class="message__meta">{{createdAt}}</span>
+        <p class="inline-distant">
+          <span>
+            <span class="message__name">{{username}}</span>
+            <span class="message__meta">{{createdAt}}</span>
+          </span>
+          <i class="fa fa-check" aria-hidden="true"></i>
         </p>
+        <div class="message-body">{{message}}</div>
       </div>
     </script>
 
@@ -68,7 +73,7 @@
       <h3 class="list-title">Users</h3>
       <ul class="users">
         {{#users}}
-        <li>{{username}}</li>
+        <li><span class="user">{{username}}</span></li>
         {{/users}}
       </ul>
     </script>

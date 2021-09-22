@@ -18,3 +18,17 @@
   height: 250px;
   width: 250px;
 }
+
+#inputFile {
+  width: 95px;
+  padding: 0;
+  height: 24px;
+  position: relative;
+  top: 25%;
+}
+
+.inline-distant {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}

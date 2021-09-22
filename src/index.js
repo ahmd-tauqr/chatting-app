@@ -50,7 +50,10 @@ io.on('connection', (socket) => {
 
     socket.join(user.room);
 
-    socket.emit('message', generateMessage(user.username, 'Welcome!'));
+    socket.emit(
+      'message',
+      generateMessage(user.username, `Welcome to ${user.room} chatroom.`)
+    );
     socket.broadcast
       .to(user.room)
       .emit(
@@ -83,19 +86,19 @@ io.on('connection', (socket) => {
       'locationMessage',
       generateLocationMessage(user.username, position)
     );
-    callback('location shared!');
+    callback();
   });
 
   //   when file is shared
   socket.on('fileShare', (file, callback) => {
     const user = getUser(socket.id);
-    console.log('=================================================>', user);
-    console.log('received', file);
+    // console.log('=================================================>', user);
+    // console.log('received', file);
     io.to(user.room).emit(
       'fileMessage',
       generateFileMessage(user.username, file.file)
     );
-    callback('file shared.');
+    callback();
   });
 
   // when a user leaves the chat
