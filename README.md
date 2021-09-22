@@ -9,8 +9,9 @@ Express
 Moment
 
 ## Features
+
 - share messages
-- share images/video upto 500KB size
+- share images(png/jpeg)/video(mp4) upto 500KB size
 - share location
 - join different chat rooms
 - message delivery acknowledgements
@@ -18,14 +19,17 @@ Moment
 - profanity words filtering and warning
 
 ## Installation guide
-1) take clone
-2) npm install
-3) npm run dev
-4) launch localhost:3000 or on custom port in browser
-5) have fun chatting
+
+1. take clone
+2. npm install
+3. npm run dev
+4. launch localhost:3000 or on custom port in browser
+5. have fun chatting
 
 ## More to come
+
 - support for media viewers within chat
+- support for more image/video formats
 - compress large media files
 - reply/quoting a message
 - more
