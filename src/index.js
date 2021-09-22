@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
 
     socket.emit(
       'message',
-      generateMessage(user.username, `Welcome to ${user.room} chatroom.`)
+      generateMessage('Admin', `Welcome to ${user.room} chatroom.`)
     );
     socket.broadcast
       .to(user.room)
@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
     if (user) {
       io.to(user.room).emit(
         'message',
-        generateMessage(user.username, `${user.username} has left.`)
+        generateMessage('Admin', `${user.username} has left.`)
       );
       io.to(user.room).emit('roomData', {
         room: user.room,
