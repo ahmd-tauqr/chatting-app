@@ -1,4 +1,5 @@
 {
+  "homepage": "http://ahmd-tauqr.github.io/chatting-app",
   "name": "chatting-app",
   "version": "1.0.0",
   "description": "a chatting app made with socket io",
