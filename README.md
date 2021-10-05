@@ -37,4 +37,4 @@ Moment
 
 ## Live
 
-[Demo](http://ahmd-tauqr.github.io/chatting-app)
+[Demo](https://chatting-node-socket.herokuapp.com/)
